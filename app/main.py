@@ -1,16 +1,18 @@
-import os
-from .models.user_model import User
-from .db.database import engine, Base, get_db
-from dotenv import load_dotenv
+from fastapi import FastAPI
+from .db.database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
+from .api.routers import auth, rag
+from .config import settings
+
+app = FastAPI(
+    title="It Support RAG API",
+    description=(
+        "This API provides endpoints for users to authenticate and as questions about it support"
+    ),
+)
 
 
-load_dotenv()
-FRONTEND_URL = os.getenv("FRONTEND_URL")
-
-app = FastAPI()
-
-origins = [FRONTEND_URL]
+origins = [settings.FRONTEND_URL]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -21,7 +23,10 @@ app.add_middleware(
 
 Base.metadata.create_all(bind=engine)
 
+app.include_router(auth.router)
+app.include_router(rag.router)
 
-@app.get("/")
+
+@app.get("/", tags=["Home route"])
 def get_home():
-    return {"message": "Hello to our sentiment api!!"}
+    return {"message": "Hello to It Support RAG API"}

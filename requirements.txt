@@ -11,3 +11,9 @@ passlib
 PyJWT
 uvicorn
 requests
+matplotlib
+seaborn
+numpy 
+pandas
+pydantic-settings
+pyarrow

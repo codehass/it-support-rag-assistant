@@ -25,3 +25,4 @@ chromadb
 langchain-huggingface
 langchain-google-genai
 langchain-classic
+mlflow

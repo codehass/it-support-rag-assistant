@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 import time
 from app.authentication.auth import get_current_user
-from ...schemas.user_schema import UserSchema, QueriesRequest, QueriesResponse
+from ...schemas.user_schema import UserSchema, QueryRequest, QueryResponse
 from ...db.database import get_db
 from sqlalchemy.orm import Session
 from ...RAG.query import ITSmartAssistant
@@ -12,9 +12,9 @@ router = APIRouter(prefix="/api/v1/rag", tags=["RAG Routes"])
 rag_instance = ITSmartAssistant()
 
 
-@router.post("/query", response_model=QueriesResponse)
-async def predict_btc_price(
-    query: QueriesRequest,
+@router.post("/query", response_model=QueryResponse)
+async def get_rag_answer(
+    query: QueryRequest,
     db: Session = Depends(get_db),
     current_user: UserSchema = Depends(get_current_user),
 ):
@@ -39,11 +39,15 @@ async def predict_btc_price(
 
 
 @router.get("/history")
-async def predict_btc_price(
+async def get_query_history(
     db: Session = Depends(get_db),
     current_user: UserSchema = Depends(get_current_user),
 ):
-    return {"message": "History endpoint"}
+    queries = db.query(Query).filter(Query.user_id == current_user.id).all()
+    if not queries:
+        return {"message": "No queries found for the user."}
+
+    return {"queries": queries}
 
 
 @router.get("/health")

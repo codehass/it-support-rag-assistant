@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     ALGORITHM: str = Field(...)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(...)
     FRONTEND_URL: str = Field(...)
+    GOOGLE_API_KEY: str = Field(...)
+    HF_TOKEN: str = Field(...)
 
     model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
 

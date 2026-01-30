@@ -1,4 +1,5 @@
-from pydantic import BaseModel, ConfigDict, Field
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict
 
 
 class UserBase(BaseModel):
@@ -26,10 +27,18 @@ class TokenData(BaseModel):
     username: str
 
 
-class QueriesRequest(BaseModel):
+class QueryResponse(BaseModel):
+    id: int
     user_id: int
     question: str
     answer: str
-    cluster: int
+    cluster: str
     latency_ms: float
-    created_at: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class QueryRequest(BaseModel):
+    question: str

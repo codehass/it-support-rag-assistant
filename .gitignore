@@ -10,3 +10,4 @@ chroma_db/
 ml/mlruns
 ml/mlflow.db
 mlflow.db
+mlartifacts

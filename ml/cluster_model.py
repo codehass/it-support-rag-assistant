@@ -1,4 +1,5 @@
 import joblib
+import mlflow
 import numpy as np
 from langchain_huggingface import HuggingFaceEmbeddings
 
@@ -11,13 +12,12 @@ class ClusterModel:
             model_name="BAAI/bge-small-en-v1.5"
         )
 
+    @mlflow.trace(name="Clustering_Step")
     def predict_cluster(self, question: str) -> int:
-        """Predicts the cluster ID for a single input string."""
         if not question.strip():
             return -1
 
         new_vector = self.embedding_function.embed_query(question)
-
         input_data = np.array(new_vector).reshape(1, -1)
         reduced_vector = self.pca.transform(input_data)
         cluster_id = self.kmeans.predict(reduced_vector)

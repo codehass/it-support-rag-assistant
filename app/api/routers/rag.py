@@ -1,70 +1,77 @@
 import os
 import time
-from pathlib import Path
 import mlflow
-from fastapi import APIRouter, Depends
+from pathlib import Path
+import json
+from fastapi import APIRouter, Depends, HTTPException, Request
 from app.authentication.auth import get_current_user
 from ...schemas.user_schema import UserSchema, QueryRequest, QueryResponse
 from ...db.database import get_db
 from sqlalchemy.orm import Session
-from ...RAG.query import ITSmartAssistant
 from ...models.user_model import Query
 from ml.cluster_model import ClusterModel
 
+router = APIRouter(prefix="/api/v1/rag", tags=["RAG Routes"])
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 MODEL_DIR = os.path.join(BASE_DIR, "ml", "models")
 
-router = APIRouter(prefix="/api/v1/rag", tags=["RAG Routes"])
 
-rag_instance = ITSmartAssistant()
 cluster = ClusterModel(model_path=os.path.join(BASE_DIR, "ml", "model"))
 
 
 @router.post("/query", response_model=QueryResponse)
-@mlflow.trace(name="RAG_Query_Endpoint")
 async def get_rag_answer(
     query: QueryRequest,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: UserSchema = Depends(get_current_user),
 ):
-    mlflow.update_current_trace(
-        tags={
-            "mlflow.model_name": "IT-Support-Clustering-Model",
-            "mlflow.model_version": "1",
-            "model": "gemini-2.5-flash",
-            "temperature": "0.7",
-            "top_k": "4",
-            "user_question": query.question,
-        }
-    )
+    assistant = getattr(request.app.state, "rag_assistant", None)
 
-    time_start = time.time()
-    rag_answer = rag_instance.ask(query.question)
-    cluster_id = cluster.predict_cluster(query.question)
-    time_end = time.time()
-    latency_ms = (time_end - time_start) * 1000
+    if not assistant:
+        raise HTTPException(status_code=503, detail="RAG Assistant is still loading.")
 
-    mlflow.update_current_trace(
-        tags={
-            "final_answer": rag_answer["answer"],
-            "latency_ms": f"{latency_ms:.2f}",
-            "chunks_used": str(rag_answer.get("source_documents", "N/A")),
-            "similarity_score": str(rag_answer.get("score", "N/A")),
-        }
-    )
+    with mlflow.start_run(run_name="rag_query"):
 
-    new_query = Query(
-        user_id=current_user.id,
-        question=query.question,
-        answer=rag_answer["answer"],
-        cluster=cluster_id,
-        latency_ms=latency_ms,
-    )
-    db.add(new_query)
-    db.commit()
-    db.refresh(new_query)
-    return new_query
+        mlflow.log_param("user_id", current_user.id)
+        mlflow.log_param("rag_version", "v1")
+
+        mlflow.log_param("llm_model", "gemini-2.5-flash")
+        mlflow.log_param("temperature", 0.7)
+        mlflow.log_param("top_k", 5)
+        mlflow.log_text(query.question, "input_question.txt")
+
+        time_start = time.time()
+        assistant = request.app.state.rag_assistant
+        rag_answer = assistant.ask(query.question)
+
+        cluster_id = cluster.predict_cluster(query.question)
+
+        time_end = time.time()
+        latency_ms = (time_end - time_start) * 1000
+
+        mlflow.log_metric("latency_ms", latency_ms)
+
+        mlflow.log_text(rag_answer["answer"], "generated_answer.txt")
+        mlflow.log_metric("num_chunks", len(rag_answer["chunks"]))
+
+        if "chunks" in rag_answer:
+            mlflow.log_dict(rag_answer["chunks"], "retrieved_chunks.json")
+
+        new_query = Query(
+            user_id=current_user.id,
+            question=query.question,
+            answer=rag_answer["answer"],
+            cluster=cluster_id,
+            latency_ms=latency_ms,
+        )
+
+        db.add(new_query)
+        db.commit()
+        db.refresh(new_query)
+
+        return new_query
 
 
 @router.get("/history")

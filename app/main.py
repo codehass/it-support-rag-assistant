@@ -4,17 +4,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from .api.routers import auth, rag
 from .config import settings
 import mlflow
+from .RAG.query import ITSmartAssistant
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Loading RAG Model weights...")
+    app.state.rag_assistant = ITSmartAssistant()
+    yield
+    print("Shutting down...")
+
 
 app = FastAPI(
     title="It Support RAG API",
+    lifespan=lifespan,
     description=(
         "This API provides endpoints for users to authenticate and as questions about it support"
     ),
 )
-
-
-mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
-mlflow.set_experiment("IT_Support_RAG_Production")
 
 origins = [settings.FRONTEND_URL]
 app.add_middleware(
@@ -26,6 +34,9 @@ app.add_middleware(
 )
 
 Base.metadata.create_all(bind=engine)
+
+mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
+mlflow.set_experiment("rag-queries")
 
 app.include_router(auth.router)
 app.include_router(rag.router)

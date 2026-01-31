@@ -1,9 +1,13 @@
+import os
+from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.Doduments import Document
 
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")
 data_path = "data/data.pdf"
 
 
@@ -33,7 +37,10 @@ def save_splits_to_chroma(
     :param chroma_db_path: Description
     :type chroma_db_path: str
     """
-    embedding_function = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+    embedding_function = HuggingFaceEmbeddings(
+        model_name="BAAI/bge-small-en-v1.5",
+        model_kwargs={"token": HF_TOKEN},
+    )
     print("Creating vector database... this may take a moment.")
     Chroma.from_documents(
         documents=splits, embedding=embedding_function, persist_directory=chroma_db_path

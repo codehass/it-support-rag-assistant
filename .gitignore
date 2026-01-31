@@ -7,3 +7,6 @@ __pycache__/
 __pycache__/
 data/
 chroma_db/
+ml/mlruns
+ml/mlflow.db
+mlflow.db

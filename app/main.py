@@ -3,6 +3,7 @@ from .db.database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 from .api.routers import auth, rag
 from .config import settings
+import mlflow
 
 app = FastAPI(
     title="It Support RAG API",
@@ -11,6 +12,9 @@ app = FastAPI(
     ),
 )
 
+
+mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
+mlflow.set_experiment("IT_Support_RAG_Production")
 
 origins = [settings.FRONTEND_URL]
 app.add_middleware(

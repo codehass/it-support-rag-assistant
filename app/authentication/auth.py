@@ -1,15 +1,16 @@
+from datetime import UTC, datetime, timedelta
+
 import jwt
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
+from ..config import settings
+from ..db import database
 from ..models.user_model import User
 from ..schemas.user_schema import TokenData
-from ..db import database
-from sqlalchemy.orm import Session
-from datetime import timedelta, datetime, timezone
-from typing import Optional
-from jwt.exceptions import InvalidTokenError
-from ..config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_schema = OAuth2PasswordBearer(tokenUrl="token")
@@ -31,12 +32,12 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=20)
+        expire = datetime.now(UTC) + timedelta(minutes=20)
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
@@ -64,8 +65,8 @@ def get_current_user(
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
-    except InvalidTokenError:
-        raise credentials_exception
+    except InvalidTokenError as err:
+        raise credentials_exception from err
 
     user = db.query(User).filter(User.username == token_data.username).first()
     if user is None:

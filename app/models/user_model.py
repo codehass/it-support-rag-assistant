@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float
+from sqlalchemy import Boolean, Column, Float, Integer, String
 from sqlalchemy.sql import func
 from sqlalchemy.types import DateTime
+
 from ..db.database import Base
 
 
@@ -21,7 +22,7 @@ class Query(Base):
     user_id = Column(Integer, nullable=False)
     question = Column(String, nullable=False)
     answer = Column(String, nullable=False)
-    cluster = Column(String, nullable=True)
+    cluster = Column(Integer, nullable=True)
     latency_ms = Column(Float, nullable=False)
     created_at = Column(
         DateTime(timezone=True), server_default=func.now(), nullable=False

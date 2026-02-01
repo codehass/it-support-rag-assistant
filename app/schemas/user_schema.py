@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -32,7 +33,7 @@ class QueryResponse(BaseModel):
     user_id: int
     question: str
     answer: str
-    cluster: str
+    cluster: int
     latency_ms: float
     created_at: datetime
 

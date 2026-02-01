@@ -1,4 +1,5 @@
 venv
+.venv
 .env
 __pycache__/
 *.pyc
@@ -7,3 +8,11 @@ __pycache__/
 __pycache__/
 data/
 chroma_db/
+ml/mlruns
+ml/mlflow.db
+mlflow.db
+mlartifacts
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

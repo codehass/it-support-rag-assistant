@@ -1,0 +1,22 @@
+target-version = "py312"
+line-length = 88
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort (Import sorting - very useful)
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501", # Line too long (handled by formatter usually)
+    "B008", # Do not perform function calls in argument defaults (FastAPI uses this heavily)
+]
+
+[format]
+
+quote-style = "double"
+indent-style = "space"

@@ -1,4 +1,5 @@
 venv
+.venv
 .env
 __pycache__/
 *.pyc
@@ -11,3 +12,7 @@ ml/mlruns
 ml/mlflow.db
 mlflow.db
 mlartifacts
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

@@ -1,8 +1,8 @@
 <a name="readme-top"></a>
 
 <div align="center">
-  <img src="public/logo-dark.png" alt="logo" width="140"  height="auto" />
-
+<img src="assets/logo.svg" alt="CodeHass Logo" 
+     style="border-radius:50%; width:200px; height:200px; object-fit:cover;">
   <br/>
 </div>
 
@@ -85,6 +85,7 @@ Clone this repository to your desired folder:
 ### Install
 
 1. Create a virtual environment:
+
    ```sh
    python3 -m venv venv
    source venv/bin/activate  # On Windows use: venv\Scripts\activate
@@ -129,9 +130,11 @@ FRONTEND_URL=http://localhost:3000
 1. **Start the Database**: Ensure your PostgreSQL service is running and the database is created.
 
 2. **Run the API**:
+
    ```sh
    uvicorn app.main:app --reload
    ```
+
    The API will be available at `http://localhost:8000`.
 
 3. **Explore Documentation**:
@@ -146,12 +149,14 @@ FRONTEND_URL=http://localhost:3000
 ### API Endpoints
 
 **Authentication**
+
 - `POST /api/v1/auth/register` - Register a new user
 - `POST /api/v1/auth/login` - Login to get access token (cookie)
 - `POST /api/v1/auth/logout` - Logout user
 - `GET /api/v1/auth/users/me` - Get current user info
 
 **RAG Support**
+
 - `POST /api/v1/rag/query` - Ask a question to the IT Support Assistant
 - `GET /api/v1/rag/history` - Get your query history
 - `GET /api/v1/rag/health` - Check backend health status
@@ -171,7 +176,6 @@ FRONTEND_URL=http://localhost:3000
 ## 🔭 Future Features <a name="future-features"></a>
 
 - [ ] **Voice Interface**: Enable voice-to-text for querying.
-- [ ] **Ticket Integration**: Automatically create Jira/ServiceNow tickets for unresolved queries.
 - [ ] **Admin Dashboard**: Analytics view for IT support managers.
 - [ ] **Feedback Loop**: User feedback mechanism to improve RAG accuracy.
 

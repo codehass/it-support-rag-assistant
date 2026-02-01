@@ -1,11 +1,13 @@
+from contextlib import asynccontextmanager
+
+import mlflow
 from fastapi import FastAPI
-from .db.database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
+
 from .api.routers import auth, rag
 from .config import settings
-import mlflow
+from .db.database import Base, engine
 from .RAG.query import ITSmartAssistant
-from contextlib import asynccontextmanager
 
 
 @asynccontextmanager

@@ -1,10 +1,11 @@
-import joblib
-import numpy as np
-import mlflow
-import time
-from langchain_huggingface import HuggingFaceEmbeddings
 import os
+import time
+
+import joblib
+import mlflow
+import numpy as np
 from dotenv import load_dotenv
+from langchain_huggingface import HuggingFaceEmbeddings
 
 load_dotenv()
 
@@ -29,7 +30,6 @@ class ClusterModel:
             return -1
 
         with mlflow.start_run(run_name="cluster_prediction", nested=True):
-
             mlflow.log_param("embedding_model", self.embedding_model_name)
             mlflow.log_param("model_path", self.model_path)
             mlflow.log_text(question, "input_question.txt")

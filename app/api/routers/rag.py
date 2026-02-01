@@ -1,15 +1,17 @@
 import os
 import time
-import mlflow
 from pathlib import Path
-import json
+
+import mlflow
 from fastapi import APIRouter, Depends, HTTPException, Request
-from app.authentication.auth import get_current_user
-from ...schemas.user_schema import UserSchema, QueryRequest, QueryResponse
-from ...db.database import get_db
 from sqlalchemy.orm import Session
-from ...models.user_model import Query
+
+from app.authentication.auth import get_current_user
 from ml.cluster_model import ClusterModel
+
+from ...db.database import get_db
+from ...models.user_model import Query
+from ...schemas.user_schema import QueryRequest, QueryResponse, UserSchema
 
 router = APIRouter(prefix="/api/v1/rag", tags=["RAG Routes"])
 
@@ -33,7 +35,6 @@ async def get_rag_answer(
         raise HTTPException(status_code=503, detail="RAG Assistant is still loading.")
 
     with mlflow.start_run(run_name="rag_query"):
-
         mlflow.log_param("user_id", current_user.id)
         mlflow.log_param("rag_version", "v1")
 

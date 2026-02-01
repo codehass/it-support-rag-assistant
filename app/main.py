@@ -10,8 +10,14 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    print("Connecting to MLflow...")
+    mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
+    mlflow.set_experiment("rag-queries")
     print("Loading RAG Model weights...")
     app.state.rag_assistant = ITSmartAssistant()
+
     yield
     print("Shutting down...")
 
@@ -20,7 +26,7 @@ app = FastAPI(
     title="It Support RAG API",
     lifespan=lifespan,
     description=(
-        "This API provides endpoints for users to authenticate and as questions about it support"
+        "This API provides endpoints for users to authenticate and ask questions about IT support"
     ),
 )
 
@@ -32,11 +38,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-Base.metadata.create_all(bind=engine)
-
-mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
-mlflow.set_experiment("rag-queries")
 
 app.include_router(auth.router)
 app.include_router(rag.router)

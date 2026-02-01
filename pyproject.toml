@@ -1,0 +1,37 @@
+    [project]
+    name = "it-support-rag-assistant"
+    version = "0.1.0"
+    description = "This API provides endpoints for users to authenticate and ask questions about IT support"
+    readme = "README.md"
+    requires-python = ">=3.12"
+    dependencies = [
+        "alembic>=1.18.3",
+        "asyncpg>=0.31.0",
+        "bcrypt==4.0.1",
+        "chromadb>=1.4.1",
+        "fastapi[standard]>=0.128.0",
+        "gunicorn>=23.0.0",
+        "httpx>=0.28.1",
+        "langchain>=0.1.0",
+        "langchain-chroma>=1.1.0",
+        "langchain-community>=0.4.1",
+        "langchain-google-genai>=4.2.0",
+        "langchain-huggingface>=1.2.0",
+        "langchain-text-splitters>=1.1.0",
+        "matplotlib>=3.10.8",
+        "mlflow>=3.9.0",
+        "numpy>=2.4.2",
+        "pandas>=2.3.3",
+        "passlib[bcrypt]>=1.7.4",
+        "psycopg2-binary>=2.9.11",
+        "pyarrow>=22.0.0",
+        "pydantic>=2.12.5",
+        "pydantic-settings>=2.12.0",
+        "pyjwt>=2.11.0",
+        "pypdf>=6.6.2",
+        "python-multipart>=0.0.22",
+        "requests>=2.32.5",
+        "seaborn>=0.13.2",
+        "sentence-transformers>=5.2.2",
+        "sqlalchemy>=2.0.46",
+]

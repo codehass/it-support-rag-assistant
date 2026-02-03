@@ -1,9 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
 
-import mlflow
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+import mlflow
 
 from .api.routers import auth, rag
 from .config import settings

@@ -37,8 +37,7 @@ class QueryResponse(BaseModel):
     latency_ms: float
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class QueryRequest(BaseModel):

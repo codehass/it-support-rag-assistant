@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: it-support
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: it-support-backend:latest
+          imagePullPolicy: Never # Important for local Minikube images
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DATABASE_HOST
+            - name: DATABASE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DATABASE_USER
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: DATABASE_PASSWORD
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DATABASE_NAME
+            - name: DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DATABASE_PORT
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: SECRET_KEY
+            - name: ALGORITHM
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: ALGORITHM
+            - name: ACCESS_TOKEN_EXPIRE_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: ACCESS_TOKEN_EXPIRE_MINUTES
+            - name: FRONTEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: FRONTEND_URL
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: GOOGLE_API_KEY
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: HF_TOKEN
+            - name: MLFLOW_TRACKING_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MLFLOW_TRACKING_URI
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: it-support
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    app: backend
+  type: NodePort # Use NodePort to access via minikube service backend

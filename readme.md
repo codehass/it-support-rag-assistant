@@ -1,8 +1,8 @@
 <a name="readme-top"></a>
 
 <div align="center">
-<img src="assets/logo.svg" alt="CodeHass Logo" 
-     style="border-radius:50%; width:200px; height:200px; object-fit:cover;">
+  <img src="public/logo-dark.png" alt="logo" width="140"  height="auto" />
+
   <br/>
 </div>
 
@@ -70,7 +70,8 @@ To get a local copy up and running, follow these steps.
 
 ### Prerequisites
 
-- Python 3.10+
+- [uv](https://docs.astral.sh/uv/) (Recommended for managing dependencies and environments)
+- Python 3.12+ (managed by uv)
 - PostgreSQL
 - Docker (optional)
 
@@ -79,29 +80,24 @@ To get a local copy up and running, follow these steps.
 Clone this repository to your desired folder:
 
 ```sh
-  git clone https://github.com/codehass/it-support-rag-assistant.git
+git clone https://github.com/codehass/it-support-rag-assistant.git
+cd it-support-rag-assistant
 ```
 
 ### Install
 
-1. Create a virtual environment:
+Install dependencies and create the virtual environment automatically:
 
-   ```sh
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows use: venv\Scripts\activate
-   ```
-
-2. Install dependencies:
-   ```sh
-   pip install -r requirements.txt
-   ```
+```sh
+uv sync
+```
 
 ### Configuration
 
 Create a `.env` file in the root directory and add your environment variables. You can copy `.env.example` as a template:
 
 ```sh
-  cp .env.example .env
+cp .env.example .env
 ```
 
 **Required `.env` Variables:**
@@ -130,11 +126,9 @@ FRONTEND_URL=http://localhost:3000
 1. **Start the Database**: Ensure your PostgreSQL service is running and the database is created.
 
 2. **Run the API**:
-
    ```sh
-   uvicorn app.main:app --reload
+   uv run fastapi dev app/main.py
    ```
-
    The API will be available at `http://localhost:8000`.
 
 3. **Explore Documentation**:
@@ -142,21 +136,31 @@ FRONTEND_URL=http://localhost:3000
 
 4. **Start MLflow UI** (Optional, for tracking):
    ```sh
-   mlflow ui
+   uv run mlflow ui
    ```
    Access MLflow dashboard at `http://localhost:5000`.
+
+### Testing & Linting
+
+1. **Run Linting** (Ruff):
+   ```sh
+   uv run ruff check .
+   ```
+
+2. **Run Tests** (Pytest):
+   ```sh
+   uv run pytest
+   ```
 
 ### API Endpoints
 
 **Authentication**
-
 - `POST /api/v1/auth/register` - Register a new user
 - `POST /api/v1/auth/login` - Login to get access token (cookie)
 - `POST /api/v1/auth/logout` - Logout user
 - `GET /api/v1/auth/users/me` - Get current user info
 
 **RAG Support**
-
 - `POST /api/v1/rag/query` - Ask a question to the IT Support Assistant
 - `GET /api/v1/rag/history` - Get your query history
 - `GET /api/v1/rag/health` - Check backend health status

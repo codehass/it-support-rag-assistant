@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -10,6 +11,9 @@ from .config import settings
 from .db.database import Base, engine
 from .RAG.query import ITSmartAssistant
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -17,7 +21,11 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     print("Connecting to MLflow...")
     mlflow.set_tracking_uri(settings.MLFLOW_TRACKING_URI)
-    mlflow.set_experiment("rag-queries")
+    try:
+        mlflow.set_experiment("rag-queries")
+    except Exception as e:
+        logger.warning(f"MLflow not available: {e}")
+
     print("Loading RAG Model weights...")
     app.state.rag_assistant = ITSmartAssistant()
 

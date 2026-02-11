@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mlflow-pvc
+  namespace: it-support
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlflow
+  namespace: it-support
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlflow
+  template:
+    metadata:
+      labels:
+        app: mlflow
+    spec:
+      containers:
+        - name: mlflow
+          image: ghcr.io/mlflow/mlflow:latest-full
+          ports:
+            - containerPort: 5000
+          env:
+            - name: BACKEND_STORE_URI
+              value: "postgresql://postgres:$(DATABASE_PASSWORD)@postgres:5432/sentiment_analysis_db"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: DATABASE_PASSWORD
+            - name: ARTIFACT_ROOT
+              value: "/mlflow/artifacts"
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              pip install psycopg2-binary --quiet &&
+              mlflow server \
+              --backend-store-uri postgresql://postgres:$(DATABASE_PASSWORD)@postgres:5432/sentiment_analysis_db \
+              --default-artifact-root /mlflow/artifacts \
+              --host 0.0.0.0 \
+              --allowed-hosts '*'
+          volumeMounts:
+            - name: mlflow-storage
+              mountPath: /mlflow/artifacts
+      volumes:
+        - name: mlflow-storage
+          persistentVolumeClaim:
+            claimName: mlflow-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mlflow
+  namespace: it-support
+spec:
+  ports:
+    - port: 5000
+  selector:
+    app: mlflow
+  type: ClusterIP

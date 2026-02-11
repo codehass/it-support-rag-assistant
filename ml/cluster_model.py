@@ -2,10 +2,11 @@ import os
 import time
 
 import joblib
-import mlflow
 import numpy as np
 from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
+
+import mlflow
 
 load_dotenv()
 

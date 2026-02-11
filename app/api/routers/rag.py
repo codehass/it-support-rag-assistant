@@ -2,10 +2,10 @@ import os
 import time
 from pathlib import Path
 
-import mlflow
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
+import mlflow
 from app.authentication.auth import get_current_user
 from ml.cluster_model import ClusterModel
 
